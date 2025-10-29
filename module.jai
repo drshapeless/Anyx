@@ -20,6 +20,29 @@ Anyx :: struct {
     accepted_types: []Type;
 }
 
+// This version of set does not allocate memory
+set :: (a: *Anyx, value: *void, ti: Type_Info) -> bool {
+    found := false;
+    for a.accepted_types {
+        if type_info(it) == ti {
+            found = true;
+            break;
+        }
+    }
+
+    if !found return false;
+
+    a.data.type = ti;
+    a.data.value_pointer = value;
+
+    if a.optional {
+        a.has_value = true;
+    }
+
+    return true;
+}
+
+// This will allocate memory
 set :: (a: *Anyx, v: $T) -> bool {
     found := false;
     for a.accepted_types {
