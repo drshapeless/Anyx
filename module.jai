@@ -13,18 +13,18 @@
 // I do not recommend any use of this type other than creating binding.
 
 Anyx :: struct {
-    data: Any;
+    value: Any;
 
     optional: bool;
     has_value: bool;
-    accepted_types: []Type;
+    accepted_types: []*Type_Info;
 }
 
 // This version of set does not allocate memory
-set :: (a: *Anyx, value: *void, ti: Type_Info) -> bool {
+set :: (a: *Anyx, value: *void, ti: *Type_Info) -> bool {
     found := false;
     for a.accepted_types {
-        if type_info(it) == ti {
+        if it == ti {
             found = true;
             break;
         }
@@ -32,8 +32,8 @@ set :: (a: *Anyx, value: *void, ti: Type_Info) -> bool {
 
     if !found return false;
 
-    a.data.type = ti;
-    a.data.value_pointer = value;
+    a.value.type = ti;
+    a.value.value_pointer = value;
 
     if a.optional {
         a.has_value = true;
@@ -46,7 +46,7 @@ set :: (a: *Anyx, value: *void, ti: Type_Info) -> bool {
 set :: (a: *Anyx, v: $T) -> bool {
     found := false;
     for a.accepted_types {
-        if it == T {
+        if it == type_info(T) {
             found = true;
             break;
         }
@@ -58,10 +58,7 @@ set :: (a: *Anyx, v: $T) -> bool {
     p := alloc(size_of(T));
     memcpy(p, *v, size_of(T));
 
-    // With this weird line of code, we omit the following two lines.
-    a.data = (cast(*T)p).*;
-    // a.data.type = type_info(T);
-    // a.data.value_pointer = p;
+    a.value = (cast(*T)p).*;
 
     if a.optional {
         a.has_value = true;
@@ -75,19 +72,15 @@ get :: (a: Anyx) -> Any, bool {
         return null, false;
     }
 
-    return a.data, true;
+    return a.value, true;
 }
 
 clear :: (a: *Anyx) -> bool {
     if !a.optional return false;
 
-    a.data = null;
+    a.value = null;
     a.has_value = false;
     return true;
-}
-
-print_anyx :: (a: Anyx) -> string {
-    return sprint("%", a.data);
 }
 
 #scope_file
