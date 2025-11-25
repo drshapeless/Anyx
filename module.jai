@@ -6,7 +6,7 @@
 
 /*
     Bar :: struct {
-        foo: Anyx = .{ optional = false, accepted_types = .[int, float] };
+    foo: Anyx = .{ optional = false, accepted_types = .[type_info(int), type_info(float)] };
     }
 */
 
